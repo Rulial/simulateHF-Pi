@@ -2,7 +2,7 @@ extends GLTFDocumentExtension
 class_name HFStateSensor
 
 
-func _import_node(state, gltf_node, json, node):
+func _import_node(state, _gltf_node, json, node):
 	var node_extensions = json.has("extensions")
 	if not json.has("extensions"):
 		return OK
@@ -10,7 +10,7 @@ func _import_node(state, gltf_node, json, node):
 		return OK
 	if node_extensions.get("HF_state_sensors"):
 		print("State sensors found.")
-		import_agents(state, json, gltf_node, node_extensions)
+		import_agents(state, json, node, node_extensions)
 	return OK
 
 func import_agents(state, json, node, extensions):

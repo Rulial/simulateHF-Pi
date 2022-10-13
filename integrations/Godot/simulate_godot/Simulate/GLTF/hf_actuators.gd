@@ -2,42 +2,65 @@ extends GLTFDocumentExtension
 class_name HFActuators
 
 
-var objects: Array
-
-
-func _import_node(state, gltf_node, json, node):
-	var node_extensions = json.get("extensions")
-	print("Import extension nodes!")
-	if not json.has("extensions"):
+func _import_node(state: GLTFState, _gltf_node: GLTFNode, json_data: Dictionary, node: Node):
+	var node_extensions = json_data.get("extensions")
+	if not json_data.has("extensions"):
 		return OK
 	if state.base_path.is_empty():
 		return OK
-	if node_extensions.has("HF_actuators"):
-		print("Actuators found.")
-		import_agents(state, json, gltf_node, node_extensions)
+	print(node_extensions)
+	if node_extensions is not null:
+		print(node_extensions)
+		print(state)
+	#	print(node_extensions.keys())
+		if node_extensions.has("HF_actuators"):
+			print("Actuators found.")
+			import_actuators(state, json_data, node, node_extensions)
 	return OK
 
-func import_agents(state, json, node, extensions):
+func import_actuators(state, json, node, extensions):
+	print("OI ZEBI?????????????????????????????????????????")
 	var actuators = extensions["HF_actuators"]["objects"]
 	var new_node = null
 	var old_node = node
 
-	for actuactor in actuators:
+	for actuator in actuators:
 		var hf_actuator: HFActuator = HFActuator.new()
-		for key in actuactor.keys():
+		new_node = hf_actuator
+		
+		for key in actuator.keys():
+			print(key)
 			match key:
 				"mapping":
-					pass
+					new_node.mapping = ActionMapping.new()
+					for mapping_key in actuator["mapping"].keys():
+						match mapping_key:
+							"action":
+								new_node.mapping.action = actuator["mapping"]["action"]
+							"amplitude":
+								new_node.mapping.amplitude = actuator["mapping"]["amplitude"]
+							"offset":
+								new_node.mapping.offset = actuator["mapping"]["offset"]
+							"axis":
+								new_node.mapping.axis = actuator["mapping"]["axis"]
+							"position":
+								new_node.mapping.position = actuator["mapping"]["position"]
+							"use_local_coordinates":
+								new_node.mapping.use_local_coordinates = actuator["mapping"]["use_local_coordinates"]
+							"is_impulse":
+								new_node.mapping.is_impulse = actuator["mapping"]["is_impulse"]
+							"max_velocity_threshold":
+								new_node.mapping.max_velocity_threshold = actuator["mapping"]["max_velocity_threshold"]
 				"n":
-					pass
+					new_node.n = actuator["n"]
 				"dtype":
-					pass
+					new_node.dtype = actuator["dtype"]
 				"low":
-					pass
+					new_node.low = actuator["low"]
 				"high":
-					pass
+					new_node.high = actuator["high"]
 				"shape":
-					pass
+					new_node.shape = actuator["shape"]
 				_:
 					print("Field not implemented")
 
@@ -47,6 +70,7 @@ func import_agents(state, json, node, extensions):
 
 
 class HFActuator:
+	extends Node
 	var mapping: ActionMapping
 	var n: int
 	var dtype: String
